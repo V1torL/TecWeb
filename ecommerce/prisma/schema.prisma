@@ -10,8 +10,8 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  password  String
-  type      UserType
+  senha  String
+  tipo     UserType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -32,8 +32,10 @@ model Admin {
 model Client {
   id     String @id @default(cuid())
   cpf    String @unique
-  name   String
-  city   String
+  nome   String
+  telefone String
+  endereco String
+  cidade   String
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 

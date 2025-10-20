@@ -1,54 +1,28 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12)
-}
-
 async function main() {
-  console.log('🌱 Iniciando seed...')
+  const existingAdmin = await prisma.user.findFirst({
+    where: { tipo: 'ADMIN' }
+  })
 
-  try {
-    await prisma.client.deleteMany()
-    await prisma.admin.deleteMany()
-    await prisma.user.deleteMany()
-
-    const adminPassword = await hashPassword('admin123')
+  if (!existingAdmin) {
+    
     await prisma.user.create({
       data: {
-        email: 'admin@example.com',
-        password: adminPassword,
-        type: 'ADMIN',
-        admin: {
-          create: {}
-        }
+        email: 'admin@ecommerce.com',
+        senha: 'admin123',
+        tipo: 'ADMIN',
+        admin: { create: {} }
       }
     })
-    console.log('✅ Admin criado: admin@example.com / admin123')
-
-    const clientPassword = await hashPassword('cliente123')
-    await prisma.user.create({
-      data: {
-        email: 'cliente@example.com',
-        password: clientPassword,
-        type: 'CLIENT',
-        client: {
-          create: {
-            cpf: '123.456.789-00',
-            name: 'João Silva',
-            city: 'São Paulo'
-          }
-        }
-      }
-    })
-    console.log('✅ Cliente criado: cliente@example.com / cliente123')
-
-    console.log('🎉 Seed completed!')
-  } catch (error) {
-    console.error('❌ Erro no seed:', error)
-    throw error
+    
+    console.log('✅ Admin pré-cadastrado criado:')
+    console.log('📧 Email: admin@ecommerce.com')
+    console.log('🔑 Senha: admin123')
+  } else {
+    console.log('ℹ️ Admin já existe no banco de dados')
   }
 }
 
