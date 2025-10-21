@@ -25,15 +25,14 @@ export default function ClientPage() {
   if (!user) return <div>Carregando...</div>
 
   return (
-    <div className="max-w-4xl mx-auto mt-10">
-      <h1 className="text-3xl font-bold">Área do Cliente</h1>
+    <div>
+      <h1>Área do Cliente</h1>
       <p>Bem-vindo, Cliente!</p>
       <button 
         onClick={() => {
           localStorage.removeItem('user')
           router.push('/login')
         }}
-        className="mt-4 bg-red-500 text-white p-2 rounded"
       >
         Sair
       </button>

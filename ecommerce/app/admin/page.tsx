@@ -25,15 +25,14 @@ export default function AdminPage() {
   if (!user) return <div>Carregando...</div>
 
   return (
-    <div className="max-w-4xl mx-auto mt-10">
-      <h1 className="text-3xl font-bold">Painel Admin</h1>
+    <div>
+      <h1>Painel Admin</h1>
       <p>Bem-vindo, Admin!</p>
       <button 
         onClick={() => {
           localStorage.removeItem('user')
           router.push('/login')
         }}
-        className="mt-4 bg-red-500 text-white p-2 rounded"
       >
         Sair
       </button>

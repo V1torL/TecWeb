@@ -1,59 +1,114 @@
 'use client'
 
 import Link from 'next/link'
+import styled from 'styled-components'
+import { Search, Home, User, ShoppingCart } from 'lucide-react'
+
+const HeaderContainer = styled.header`
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  background-color: #0a0a0a;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+`
+
+const HeaderContent = styled.div`
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+`
+
+const SearchBox = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: #1a1a1a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 24px;
+
+  input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e5e5e5;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-left: 8px;
+  }
+
+  svg {
+    color: #9ca3af;
+  }
+`
+
+const AuthArea = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .login-links {
+    font-size: 0.8rem;
+    text-align: right;
+
+    a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #9ca3af;
+      }
+    }
+
+    span {
+      color: #9ca3af;
+      margin: 0 4px;
+    }
+  }
+
+  svg {
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #9ca3af;
+    }
+  }
+`
 
 export default function Header() {
-
-  const categorias = [
-    'Eletrônicos',
-    'Roupas',
-    'Casa',
-    'Esportes',
-    'Beleza',
-    'Livros',
-    'Brinquedos',
-    'Automotivo'
-  ]
-
   return (
-    <header className="w-full">
-      <div className="bg-black text-white py-2 px-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center hover:text-gray-300">
-            Home
-          </Link>
-          <div className="flex space-x-4">
-            <Link 
-              href="/login" 
-              className="hover:text-gray-300 transition-colors"
-            >
-              Entrar
-            </Link>
-            <Link 
-              href="/register" 
-              className="hover:text-gray-300 transition-colors"
-            >
-              Cadastrar
-            </Link>
-          </div>
-        </div>
-      </div>
+    <HeaderContainer>
+      <HeaderContent>
 
-      <div className="bg-white border-b py-3 px-6">
-        <div className="max-w-7xl mx-auto">
-          <nav className="flex space-x-8 overflow-x-auto">
-            {categorias.map((categoria, index) => (
-              <Link
-                key={index}
-                href={`/categoria/${categoria.toLowerCase()}`}
-                className="whitespace-nowrap text-gray-700 hover:text-black font-medium transition-colors"
-              >
-                {categoria}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </div>
-    </header>
+        <Link href="/">
+          <Home size={20}/>
+        </Link>
+
+        <SearchBox>
+          <Search size={16} />
+          <input type="text" placeholder="Busque na Loja" />
+        </SearchBox>
+
+        <AuthArea>
+          <div className="login-links">
+            <Link href="/login">Entre</Link>
+            <span>ou</span>
+            <Link href="/register">Cadastre-se</Link>
+          </div>
+          <User size={20} />
+          <ShoppingCart size={20} />
+        </AuthArea>
+      </HeaderContent>
+    </HeaderContainer>
   )
 }
