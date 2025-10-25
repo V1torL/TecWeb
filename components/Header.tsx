@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import styled from 'styled-components'
-import { Search, Home, User, ShoppingCart } from 'lucide-react'
+import Link from "next/link";
+import styled from "styled-components";
+import { Search, Home, User, ShoppingCart } from "lucide-react";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -13,7 +13,7 @@ const HeaderContainer = styled.header`
   background-color: #0a0a0a;
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-`
+`;
 
 const HeaderContent = styled.div`
   max-width: 1280px;
@@ -22,7 +22,7 @@ const HeaderContent = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-`
+`;
 
 const SearchBox = styled.div`
   display: flex;
@@ -47,7 +47,7 @@ const SearchBox = styled.div`
   svg {
     color: #9ca3af;
   }
-`
+`;
 
 const AuthArea = styled.div`
   display: flex;
@@ -83,32 +83,31 @@ const AuthArea = styled.div`
       color: #9ca3af;
     }
   }
-`
+`;
 
 export default function Header() {
-  return (
-    <HeaderContainer>
-      <HeaderContent>
+	return (
+		<HeaderContainer>
+			<HeaderContent>
+				<Link href="/">
+					<Home size={20} />
+				</Link>
 
-        <Link href="/">
-          <Home size={20}/>
-        </Link>
+				<SearchBox>
+					<Search size={16} />
+					<input type="text" placeholder="Busque na Loja" />
+				</SearchBox>
 
-        <SearchBox>
-          <Search size={16} />
-          <input type="text" placeholder="Busque na Loja" />
-        </SearchBox>
-
-        <AuthArea>
-          <div className="login-links">
-            <Link href="/login">Entre</Link>
-            <span>ou</span>
-            <Link href="/register">Cadastre-se</Link>
-          </div>
-          <User size={20} />
-          <ShoppingCart size={20} />
-        </AuthArea>
-      </HeaderContent>
-    </HeaderContainer>
-  )
+				<AuthArea>
+					<div className="login-links">
+						<Link href="/login">Entre</Link>
+						<span>ou</span>
+						<Link href="/register">Cadastre-se</Link>
+					</div>
+					<User size={20} />
+					<ShoppingCart size={20} />
+				</AuthArea>
+			</HeaderContent>
+		</HeaderContainer>
+	);
 }
