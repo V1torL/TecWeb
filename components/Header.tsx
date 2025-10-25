@@ -6,9 +6,8 @@ import { Search, Home, User, ShoppingCart } from "lucide-react";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
   z-index: 50;
   background-color: #0a0a0a;
   color: white;

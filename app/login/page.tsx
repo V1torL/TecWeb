@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
-import Header from "@/components/Header";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -132,35 +131,32 @@ export default function Login() {
 		};
 
 	return (
-		<>
-			<Header />
-			<Container>
-				<Box>
-					<Title>Login</Title>
-					<Form onSubmit={handleSubmit}>
-						<Input
-							type="email"
-							placeholder="Email"
-							value={form.email}
-							onChange={handleChange("email")}
-							required
-						/>
-						<Input
-							type="password"
-							placeholder="Senha"
-							value={form.senha}
-							onChange={handleChange("senha")}
-							required
-						/>
-						<Button type="submit" disabled={loading}>
-							{loading ? "Entrando..." : "Entrar"}
-						</Button>
-					</Form>
-					<Text>
-						Não tem conta? <Link href="/register">Cadastre-se</Link>
-					</Text>
-				</Box>
-			</Container>
-		</>
+		<Container>
+			<Box>
+				<Title>Login</Title>
+				<Form onSubmit={handleSubmit}>
+					<Input
+						type="email"
+						placeholder="Email"
+						value={form.email}
+						onChange={handleChange("email")}
+						required
+					/>
+					<Input
+						type="password"
+						placeholder="Senha"
+						value={form.senha}
+						onChange={handleChange("senha")}
+						required
+					/>
+					<Button type="submit" disabled={loading}>
+						{loading ? "Entrando..." : "Entrar"}
+					</Button>
+				</Form>
+				<Text>
+					Não tem conta? <Link href="/register">Cadastre-se</Link>
+				</Text>
+			</Box>
+		</Container>
 	);
 }
