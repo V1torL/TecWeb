@@ -1,37 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
+import { ClientLogoutAction } from "@/lib/actions";
+import { useUser } from "@/lib/auth";
 
 export default function AdminPage() {
-	const [user, setUser] = useState(null);
-	const router = useRouter();
+	const userData = useUser();
 
-	useEffect(() => {
-		const userData = localStorage.getItem("user");
-		if (!userData) {
-			router.push("/login");
-			return;
-		}
+	if (!userData) {
+		redirect("/login");
+	}
 
-		const userObj = JSON.parse(userData);
-		setUser(userObj);
-
-		if (userObj.tipo !== "ADMIN") {
-			router.push("/client");
-		}
-	}, [router]);
-
-	if (!user) return <div>Carregando...</div>;
+	if (userData.tipo !== "ADMIN") {
+		redirect("/client");
+		return;
+	}
 
 	return (
 		<div>
 			<h1>Painel Admin</h1>
 			<p>Bem-vindo, Admin!</p>
 			<button
-				onClick={() => {
-					localStorage.removeItem("user");
-					router.push("/login");
+				onClick={async () => {
+					await ClientLogoutAction('/login')
 				}}
 			>
 				Sair

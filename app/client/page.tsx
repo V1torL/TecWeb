@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ClientLogoutAction } from "@/lib/actions";
 
 export default function ClientPage() {
 	const [user, setUser] = useState(null);
@@ -29,9 +30,8 @@ export default function ClientPage() {
 			<h1>Área do Cliente</h1>
 			<p>Bem-vindo, Cliente!</p>
 			<button
-				onClick={() => {
-					localStorage.removeItem("user");
-					router.push("/login");
+				onClick={async () => {
+					await ClientLogoutAction('/login')
 				}}
 			>
 				Sair

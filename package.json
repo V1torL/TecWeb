@@ -7,7 +7,7 @@
 		"build": "next build --turbopack",
 		"start": "next start",
 		"lint": "eslint",
-    "db:init": "prisma migrate dev; prisma generate",
+		"db:init": "prisma migrate dev; prisma generate",
 		"db:push": "prisma db push",
 		"db:studio": "prisma studio",
 		"db:generate": "prisma generate",
@@ -16,6 +16,7 @@
 		"db:seed": "tsx prisma/seed.ts"
 	},
 	"dependencies": {
+		"@auth/prisma-adapter": "^2.11.1",
 		"@prisma/client": "^6.17.1",
 		"lucide-react": "^0.546.0",
 		"next": "15.5.6",

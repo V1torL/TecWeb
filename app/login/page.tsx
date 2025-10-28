@@ -1,8 +1,9 @@
 "use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import { signIn } from "@/lib/auth";
+import { ClientLoginAction } from "@/lib/actions";
+import { useFormStatus } from "react-dom";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -83,74 +84,38 @@ const Link = styled.a`
 `;
 
 export default function Login() {
-	const [form, setForm] = useState({
-		email: "",
-		senha: "",
-	});
-	const [loading, setLoading] = useState(false);
-	const router = useRouter();
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setLoading(true);
-
-		try {
-			const res = await fetch("/api/auth/login", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(form),
-			});
-
-			const data = await res.json();
-
-			if (res.ok) {
-				localStorage.setItem("user", JSON.stringify(data.user));
-
-				if (data.user.tipo === "ADMIN") {
-					router.push("/admin");
-				} else {
-					router.push("/client");
-				}
-			} else {
-				alert(data.error || "Erro ao fazer login");
-			}
-		} catch (error) {
-			console.error("Erro ao fazer login:", error);
-			alert("Erro de conexão");
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const handleChange =
-		(field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-			setForm((prev) => ({
-				...prev,
-				[field]: e.target.value,
-			}));
-		};
+	"use client";
+	const { pending } = useFormStatus();
+	const [error, setError] = useState<string | null>(null);
 
 	return (
 		<Container>
 			<Box>
 				<Title>Login</Title>
-				<Form onSubmit={handleSubmit}>
+				<Form
+					action={async (e) => {
+						const err = await ClientLoginAction(e);
+						console.log(err);
+						setError(err.error);
+					}}
+				>
 					<Input
+						defaultValue="email@email.com"
 						type="email"
+						name="email"
 						placeholder="Email"
-						value={form.email}
-						onChange={handleChange("email")}
 						required
 					/>
 					<Input
+						defaultValue="123"
+						name="password"
 						type="password"
 						placeholder="Senha"
-						value={form.senha}
-						onChange={handleChange("senha")}
 						required
 					/>
-					<Button type="submit" disabled={loading}>
-						{loading ? "Entrando..." : "Entrar"}
+					{!error ? null : <p>{error}</p>}
+					<Button disabled={pending}>
+						{pending ? "Entrando..." : "Entrar"}
 					</Button>
 				</Form>
 				<Text>
