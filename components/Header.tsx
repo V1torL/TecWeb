@@ -103,7 +103,9 @@ export default function Header() {
 						<span>ou</span>
 						<Link href="/register">Cadastre-se</Link>
 					</div>
-					<User size={20} />
+					<Link href="/user">
+						<User size={20} />
+					</Link>
 					<ShoppingCart size={20} />
 				</AuthArea>
 			</HeaderContent>

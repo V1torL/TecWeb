@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import styled from "styled-components";
+import { registerUserAction } from "./actions";
+import { useFormStatus } from "react-dom";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -78,93 +79,35 @@ const Link = styled.a`
 `;
 
 export default function Register() {
-	const [form, setForm] = useState({
-		email: "",
-		senha: "",
-		cpf: "",
-		nome: "",
-		telefone: "",
-		endereco: "",
-		cidade: "",
-	});
-
-	const router = useRouter();
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-
-		const res = await fetch("/api/auth/register", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(form),
-		});
-
-		const data = await res.json();
-
-		if (res.ok) {
-			alert("Cadastro realizado! Faça login.");
-			router.push("/login");
-		} else {
-			alert(data.error);
-		}
-	};
+	const { pending } = useFormStatus();
+	const [error, setError] = useState<string | undefined>();
 
 	return (
 		<Container>
 			<Box>
 				<Title>Cadastro de Cliente</Title>
-				<Form onSubmit={handleSubmit}>
-					<Input
-						type="email"
-						placeholder="Email"
-						value={form.email}
-						onChange={(e) => setForm({ ...form, email: e.target.value })}
-						required
-					/>
-					<Input
-						type="password"
-						placeholder="Senha"
-						value={form.senha}
-						onChange={(e) => setForm({ ...form, senha: e.target.value })}
-						required
-					/>
-					<Input
-						type="text"
-						placeholder="CPF"
-						value={form.cpf}
-						onChange={(e) => setForm({ ...form, cpf: e.target.value })}
-						required
-					/>
-					<Input
-						type="text"
-						placeholder="Nome"
-						value={form.nome}
-						onChange={(e) => setForm({ ...form, nome: e.target.value })}
-						required
-					/>
-					<Input
-						type="text"
-						placeholder="Telefone"
-						value={form.telefone}
-						onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-						required
-					/>
-					<Input
-						type="text"
-						placeholder="Endereço"
-						value={form.endereco}
-						onChange={(e) => setForm({ ...form, endereco: e.target.value })}
-						required
-					/>
-					<Input
-						type="text"
-						placeholder="Cidade"
-						value={form.cidade}
-						onChange={(e) => setForm({ ...form, cidade: e.target.value })}
-						required
-					/>
-					<Button type="submit">Cadastrar</Button>
+				<Form
+					onSubmit={async (e) => {
+						e.preventDefault();
+						const formData = new FormData(e.currentTarget);
+						const error = await registerUserAction(
+							Object.fromEntries(formData),
+						);
+						setError(error?.error);
+					}}
+				>
+					<Input name="email" type="email" placeholder="Email" required />
+					<Input name="senha" type="password" placeholder="Senha" required />
+					<Input name="cpf" type="text" placeholder="CPF" required />
+					<Input name="nome" type="text" placeholder="Nome" required />
+					<Input name="telefone" type="text" placeholder="Telefone" required />
+					<Input name="endereco" type="text" placeholder="Endereço" required />
+					<Input name="cidade" type="text" placeholder="Cidade" required />
+					<Button type="submit" disabled={pending}>
+						Cadastrar
+					</Button>
 				</Form>
+				{!error ? null : <Text>Erro: {error}</Text>}
 				<Text>
 					Já possui conta? <Link href="/login">Faça login</Link>
 				</Text>

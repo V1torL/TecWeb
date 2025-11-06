@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import styled from "styled-components";
-import { signIn } from "@/lib/auth";
-import { ClientLoginAction } from "@/lib/actions";
+import { loginAction } from "@/lib/actions";
 import { useFormStatus } from "react-dom";
+import { Form, Button, Input } from "@/lib/elements";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -27,45 +27,6 @@ const Title = styled.h1`
   font-size: 24px;
   margin-bottom: 25px;
   color: #222;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-
-  &:focus {
-    border-color: #0070f3;
-    outline: none;
-  }
-`;
-
-const Button = styled.button`
-  background-color: #0070f3;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
 `;
 
 const Text = styled.p`
@@ -94,25 +55,13 @@ export default function Login() {
 				<Title>Login</Title>
 				<Form
 					action={async (e) => {
-						const err = await ClientLoginAction(e);
+						const err = await loginAction(Object.fromEntries(e));
 						console.log(err);
 						setError(err.error);
 					}}
 				>
-					<Input
-						defaultValue="email@email.com"
-						type="email"
-						name="email"
-						placeholder="Email"
-						required
-					/>
-					<Input
-						defaultValue="123"
-						name="password"
-						type="password"
-						placeholder="Senha"
-						required
-					/>
+					<Input type="email" name="email" placeholder="Email" required />
+					<Input name="password" type="password" placeholder="Senha" required />
 					{!error ? null : <p>{error}</p>}
 					<Button disabled={pending}>
 						{pending ? "Entrando..." : "Entrar"}

@@ -4,8 +4,7 @@ import assert from "node:assert";
 import prisma from "./prisma";
 import { signIn, signOut } from "./auth";
 import { AuthError } from "next-auth";
-
-export async function ServerLogInAction({
+export async function authenticateAction({
 	email,
 	password,
 }: Partial<Record<"email" | "password", unknown>>) {
@@ -13,32 +12,33 @@ export async function ServerLogInAction({
 	assert(typeof password === "string");
 	const user = await prisma.user.findUnique({
 		where: { email: email, senha: password },
+		include: {
+			client: true,
+			admin: true,
+		},
 	});
-	console.log("aaaaaaaaaaaaaa", user);
 	return user;
 }
 
-export async function ClientLoginAction(
-	formData: FormData,
+export async function loginAction(
+	loginData: object,
 ): Promise<{ error: string; detail: any }> {
 	try {
 		await signIn("credentials", {
 			redirectTo: "/user",
-			...Object.fromEntries(formData),
+			...loginData,
 		});
 	} catch (e) {
 		if (e instanceof AuthError) {
-			return { error: "Invalid credentials", detail: e };
+			return { error: "Credenciais Inválidas", detail: e };
 		}
 		throw e;
 	}
 	throw "Unreachable";
 }
 
-export async function ClientLogoutAction(
-	redirect: string,
-): Promise<never> {
-		return await signOut({
-			redirectTo: redirect,
-		});
+export async function logoutAction(redirect: string): Promise<never> {
+	return await signOut({
+		redirectTo: redirect,
+	});
 }

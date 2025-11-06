@@ -1,14 +1,27 @@
+"use client";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { useUser } from "@/lib/auth";
+import { logoutAction } from "@/lib/actions";
 
-export default async function UserRedirect() {
-	const user = await getUser();
-	var url = "/";
-	console.log("user", user);
-	if (user?.tipo === "CLIENT") {
-		url = "/client";
-	} else if (user?.tipo === "ADMIN") {
-		url = "/admin";
+export default function UserRedirect() {
+	const { user, status } = useUser();
+	if (status === "loading") {
+		return null;
 	}
-	redirect(url);
+
+	if (!user) {
+		redirect("/login");
+	}
+
+	console.log(user);
+	const name = user.tipo === "ADMIN" ? "Admin" : user?.client?.nome;
+
+	return (
+		<>
+			<h1>Olá, {name}</h1>
+			<button type="button" onClick={(_) => logoutAction("/")}>
+				Logout
+			</button>
+		</>
+	);
 }
