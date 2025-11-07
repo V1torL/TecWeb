@@ -4,6 +4,8 @@ import assert from "node:assert";
 import prisma from "./prisma";
 import { signIn, signOut } from "./auth";
 import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 export async function authenticateAction({
 	email,
 	password,
@@ -25,6 +27,7 @@ export async function loginAction(
 ): Promise<{ error: string; detail: any }> {
 	try {
 		await signIn("credentials", {
+			redirect: true,
 			redirectTo: "/user",
 			...loginData,
 		});
@@ -34,11 +37,10 @@ export async function loginAction(
 		}
 		throw e;
 	}
-	throw "Unreachable";
 }
 
-export async function logoutAction(redirect: string): Promise<never> {
+export async function logoutAction(): Promise<never> {
 	return await signOut({
-		redirectTo: redirect,
+		redirectTo: "/login",
 	});
 }

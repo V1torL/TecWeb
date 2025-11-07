@@ -19,7 +19,6 @@ export async function registerUserAction(
 ): Promise<{ error: string } | undefined> {
 	try {
 		const userData = await CreateUserSchema.parseAsync(body);
-		console.log(userData);
 		const userExists = await prisma.user.findUnique({
 			where: { email: userData.email },
 		});
@@ -51,10 +50,8 @@ export async function registerUserAction(
 				client: true,
 			},
 		});
-		console.log("Login");
 		await loginAction({ email: userData.email, password: userData.senha });
 	} catch (e) {
-		console.log(e);
 		if (e instanceof z.ZodError) {
 			return { error: "Dados inválidos" };
 		}

@@ -1,27 +1,26 @@
-"use client";
+"use server";
+
+// !IMPORTANT: Deve ser um server component, senão
+// aquele bug de voltar pro login se repete.
+
 import { redirect } from "next/navigation";
-import { useUser } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions";
+import { getUser } from "@/lib/auth";
 
-export default function UserRedirect() {
-	const { user, status } = useUser();
-	if (status === "loading") {
-		return null;
-	}
-
+export default async function UserRedirect() {
+	const user = await getUser();
 	if (!user) {
 		redirect("/login");
 	}
 
-	console.log(user);
 	const name = user.tipo === "ADMIN" ? "Admin" : user?.client?.nome;
 
 	return (
 		<>
 			<h1>Olá, {name}</h1>
-			<button type="button" onClick={(_) => logoutAction("/")}>
-				Logout
-			</button>
+			<form action={logoutAction}>
+				<button type="submit">Logout</button>
+			</form>
 		</>
 	);
 }

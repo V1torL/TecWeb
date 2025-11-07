@@ -56,7 +56,6 @@ export default function Login() {
 				<Form
 					action={async (e) => {
 						const err = await loginAction(Object.fromEntries(e));
-						console.log(err);
 						setError(err.error);
 					}}
 				>
