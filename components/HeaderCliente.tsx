@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import styled from "styled-components";
-import { Search, ShoppingCart } from "lucide-react";
+import { Search, User, ShoppingCart } from "lucide-react";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -83,30 +83,28 @@ const AuthArea = styled.div`
   }
 `;
 
-export default function Header() {
-	return (
-		<HeaderContainer>
-			<HeaderContent>
-				<Link href="/">
-					<h1>Elementx Fitness</h1>
-				</Link>
+export default function HeaderCliente() {
+    return (
+        <HeaderContainer>
+            <HeaderContent>
+                <Link href="/cliente">
+                    <h1>Elementx Fitness</h1>
+                </Link>
 
-				<SearchBox>
-					<Search size={16} />
-					<input type="text" placeholder="Busque na Loja" />
-				</SearchBox>
+                <SearchBox>
+                    <Search size={16} />
+                    <input type="text" placeholder="Busque na Loja" />
+                </SearchBox>
 
-				<AuthArea>
-					<div className="login-links">
-						<Link href="/login">Entre</Link>
-						<span>ou</span>
-						<Link href="/register">Cadastre-se</Link>
-					</div>
-          <Link href="/">
+                <AuthArea>
+                    <Link href="/cliente/perfil">
+                        <User size={20} />
+                    </Link>
+                    <Link href="/cliente/carrinho">
 						<ShoppingCart size={20} />
 					</Link>
-				</AuthArea>
-			</HeaderContent>
-		</HeaderContainer>
-	);
+                </AuthArea>
+            </HeaderContent>
+        </HeaderContainer>
+    );
 }

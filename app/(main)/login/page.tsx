@@ -11,7 +11,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 80px;
+  padding-top: 10px;
 `;
 
 const Box = styled.div`
@@ -55,8 +55,8 @@ export default function Login() {
 				<Title>Login</Title>
 				<Form
 					action={async (e) => {
-						const err = await loginAction(Object.fromEntries(e));
-						setError(err.error);
+						const res = await loginAction(Object.fromEntries(e));
+						if (res?.error) setError(res.error);
 					}}
 				>
 					<Input type="email" name="email" placeholder="Email" required />

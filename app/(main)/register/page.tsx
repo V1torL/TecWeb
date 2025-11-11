@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { registerUserAction } from "./actions";
 import { useFormStatus } from "react-dom";

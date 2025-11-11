@@ -1,6 +1,4 @@
-import Header from "@/components/Header";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 
 export const metadata = {
 	title: "Ecommerce",
@@ -15,7 +13,6 @@ export default function RootLayout({
 	return (
 		<html lang="pt-BR">
 			<body>
-				<Header />
 				{children}
 			</body>
 		</html>

@@ -33,6 +33,7 @@ model Admin {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  addStocks AddStock[]
   @@map("admins")
 }
 
@@ -46,6 +47,7 @@ model Client {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  carts Cart[]
   @@map("clients")
 }
 
@@ -94,4 +96,66 @@ model VerificationToken {
   expires    DateTime
  
   @@unique([identifier, token])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  addStocks   AddStock[]
+  productsInCarts ProductInCart[]
+}
+
+model AddStock {
+  id             String   @id @default(cuid())
+  count          Int
+  createdAt      DateTime @default(now())
+  productId      String
+  adminId String
+
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  admin         Admin          @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model ProductInCart {
+  id        String   @id @default(cuid())
+  amount    Int
+  cartId    String
+  productId String
+
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  clientId  String
+  orderId   String?
+
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  order     Order?   @relation(fields: [orderId], references: [id])
+  products  ProductInCart[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  status      String
+  arrive_date DateTime?
+  paymentId   String?
+
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+  carts       Cart[]
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  method     String
+  address    String
+  total_paid Float
+  orders     Order[]
 }
