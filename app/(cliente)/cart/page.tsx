@@ -4,6 +4,12 @@ import { Product } from "@prisma/client";
 import { redirect } from "next/navigation";
 import "./cart.css";
 import { Button } from "@/lib/elements";
+import Client, { Props } from "./client";
+
+async function formSubmit(data: FormData) {
+	const obj = Object.fromEntries(data);
+	const cartId = obj.cartId as string;
+}
 
 export default async function Cart() {
 	const user = await getUser();
@@ -18,49 +24,30 @@ export default async function Cart() {
 			products: true,
 		},
 	});
-	console.log(cart);
+	if (!cart) {
+		throw "No cart";
+	}
 	const productsInCart = cart?.products || [];
 
-	const products: [number, Product][] = (
+	const products = (
 		await Promise.all(
-			productsInCart.map(async (p, i) => {
+			productsInCart.map(async (p) => {
 				const product = await prisma.product.findUnique({
 					where: { id: p.productId },
 				});
-				return [i, product];
+				const pic = { ...p, product };
+				return pic;
 			}) || [],
 		)
-	).filter(([_, p]) => p !== null);
+	).filter((p) => p.product !== null) as Props["products"];
 
 	return (
-		<div className="flex-list">
+		<form className="flex-list">
 			{products.length === 0 ? (
 				<p>Sem produtos ainda!</p>
 			) : (
-				<>
-					<table>
-						<thead>
-							<tr>
-								<th>Nome</th>
-								<th>Preço</th>
-								<th>Quantia</th>
-								<th>Total</th>
-							</tr>
-						</thead>
-						<tbody>
-							{products.map(([pid, p]) => (
-								<tr key={pid}>
-									<td>{p.name}</td>
-									<td>R$ {p.price}</td>
-									<td>{productsInCart[pid].amount}</td>
-									<td>R$ {productsInCart[pid].amount * p.price}</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-					<button type="button">Comprar</button>
-				</>
+				<Client cart={cart} products={products} />
 			)}
-		</div>
+		</form>
 	);
 }

@@ -82,6 +82,7 @@ export async function addToCart(productId: string, amount: number) {
 	var currentCart = await prisma.cart.findFirst({
 		where: {
 			clientId: user.client.id,
+			orderId: null,
 		},
 	});
 	if (!currentCart) {
@@ -91,7 +92,7 @@ export async function addToCart(productId: string, amount: number) {
 			},
 		});
 	}
-	const i = await prisma.productInCart.create({
+	await prisma.productInCart.create({
 		data: {
 			amount,
 			cartId: currentCart.id,
