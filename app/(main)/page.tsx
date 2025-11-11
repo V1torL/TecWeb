@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getAllProducts } from "@/lib/actions/products";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Product {
   id: string;
@@ -29,7 +31,7 @@ const Card = styled.div`
   flex-direction: column;
   justify-content: space-between;
   width: 240px;
-  height: 300px;
+  height: 340px; /* Aumentei a altura para acomodar a imagem */
   transition: transform 0.2s, box-shadow 0.2s;
   text-align: center;
 
@@ -39,11 +41,24 @@ const Card = styled.div`
   }
 `;
 
+const ProductImage = styled.div`
+  width: 100%;
+  height: 140px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+`;
+
 const ProductName = styled.h2`
   font-size: 1.1rem;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   min-height: 48px; /* Mantém altura uniforme mesmo com nomes diferentes */
 `;
 
@@ -51,7 +66,7 @@ const ProductPrice = styled.p`
   font-size: 1.1rem;
   font-weight: 600;
   color: #10b981;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 `;
 
 const AddButton = styled.button`
@@ -85,6 +100,7 @@ const Loading = styled.p`
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -100,6 +116,10 @@ export default function Home() {
     fetchProducts();
   }, []);
 
+  const handleAddToCart = () => {
+    router.push("/login");
+  };
+
   if (loading) {
     return <Loading>Carregando produtos...</Loading>;
   }
@@ -108,9 +128,17 @@ export default function Home() {
     <Container>
       {products.map((product) => (
         <Card key={product.id}>
+          <ProductImage>
+            <Image 
+              src="/produto_sem_imagem.jpg"
+              alt={product.name}
+              fill
+              style={{ objectFit: "cover" }}
+            />
+          </ProductImage>
           <ProductName>{product.name}</ProductName>
           <ProductPrice>R$ {product.price.toFixed(2)}</ProductPrice>
-          <AddButton>Adicionar ao Carrinho</AddButton>
+          <AddButton onClick={handleAddToCart}>Adicionar ao Carrinho</AddButton>
         </Card>
       ))}
     </Container>

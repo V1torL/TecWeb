@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import styled from "styled-components";
-import { Search, User, ShoppingCart } from "lucide-react";
+import { Search, User, ShoppingCart, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -84,27 +85,31 @@ const AuthArea = styled.div`
 `;
 
 export default function HeaderCliente() {
-    return (
-        <HeaderContainer>
-            <HeaderContent>
-                <Link href="/cliente">
-                    <h1>Elementx Fitness</h1>
-                </Link>
+  return (
+    <HeaderContainer>
+      <HeaderContent>
+        <Link href="/home">
+          <h1>Elementx Fitness</h1>
+        </Link>
 
-                <SearchBox>
-                    <Search size={16} />
-                    <input type="text" placeholder="Busque na Loja" />
-                </SearchBox>
+        <SearchBox>
+          <Search size={16} />
+          <input type="text" placeholder="Busque na Loja" />
+        </SearchBox>
 
-                <AuthArea>
-                    <Link href="/cliente/perfil">
-                        <User size={20} />
-                    </Link>
-                    <Link href="/cliente/carrinho">
-						<ShoppingCart size={20} />
-					</Link>
-                </AuthArea>
-            </HeaderContent>
-        </HeaderContainer>
-    );
+        <AuthArea>
+          <Link href="/perfil">
+            <User size={20} />
+          </Link>
+          <Link href="/cart">
+            <ShoppingCart size={20} />
+          </Link>
+          <LogOut
+            size={20}
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          />
+        </AuthArea>
+      </HeaderContent>
+    </HeaderContainer>
+  );
 }

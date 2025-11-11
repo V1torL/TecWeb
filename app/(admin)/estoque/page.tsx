@@ -31,7 +31,8 @@ const Table = styled.table`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   min-width: 600px;
 
-  th, td {
+  th,
+  td {
     padding: 12px 16px;
     text-align: left;
   }
@@ -71,7 +72,7 @@ const Input = styled.input`
   }
 `;
 
-const AddButton = styled.button`
+const AddButton = styled.button<{ loading?: boolean }>`
   padding: 6px 12px;
   background-color: #3b82f6;
   color: white;
@@ -85,6 +86,12 @@ const AddButton = styled.button`
     background-color: #2563eb;
     transform: translateY(-1px);
   }
+
+  &:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+    transform: none;
+  }
 `;
 
 interface Product {
@@ -95,6 +102,7 @@ interface Product {
 
 export default function EstoquePage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -105,10 +113,12 @@ export default function EstoquePage() {
   }, []);
 
   async function handleAddStock(productId: string, count: number) {
+    setLoadingIds((prev) => [...prev, productId]);
     await addStockAction(productId, count);
     setProducts((prev) =>
       prev.map((p) => (p.id === productId ? { ...p, stock: p.stock + count } : p))
     );
+    setLoadingIds((prev) => prev.filter((id) => id !== productId));
   }
 
   return (
@@ -133,14 +143,18 @@ export default function EstoquePage() {
                     <Form
                       onSubmit={async (e) => {
                         e.preventDefault();
-                        const formData = new FormData(e.currentTarget);
+                        const form = e.target as HTMLFormElement;
+                        const formData = new FormData(form);
                         const count = Number(formData.get("count"));
+                        if (!count || count <= 0) return;
                         await handleAddStock(p.id, count);
-                        e.currentTarget.reset();
+                        form.reset();
                       }}
                     >
                       <Input name="count" type="number" min="1" required />
-                      <AddButton type="submit">Adicionar</AddButton>
+                      <AddButton type="submit" disabled={loadingIds.includes(p.id)}>
+                        {loadingIds.includes(p.id) ? "Adicionando..." : "Adicionar"}
+                      </AddButton>
                     </Form>
                   </td>
                 </tr>

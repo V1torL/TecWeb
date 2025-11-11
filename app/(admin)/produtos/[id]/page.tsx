@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
 import { getProductById } from "@/lib/actions/products";
 import { updateProductAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
@@ -30,7 +31,7 @@ const Form = styled.form`
   background-color: #ffffff;
   border-radius: 12px;
   padding: 32px 24px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -53,7 +54,7 @@ const Input = styled.input`
 
   &:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
 `;
 
@@ -68,25 +69,26 @@ const Textarea = styled.textarea`
 
   &:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
   }
 `;
 
-const Button = styled.button`
+const Button = styled.button<{ disabled?: boolean }>`
   padding: 12px;
   border-radius: 8px;
   border: none;
-  background-color: #10b981;
+  background-color: ${({ disabled }) => (disabled ? "#6b7280" : "#10b981")};
   color: white;
   font-weight: 600;
   font-size: 1rem;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   transition: all 0.2s;
 
   &:hover {
-    background-color: #059669;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    background-color: ${({ disabled }) => (disabled ? "#6b7280" : "#059669")};
+    transform: ${({ disabled }) => (disabled ? "none" : "translateY(-1px)")};
+    box-shadow: ${({ disabled }) =>
+      disabled ? "none" : "0 4px 10px rgba(0,0,0,0.15)"};
   }
 `;
 
@@ -95,7 +97,7 @@ const NotFoundContainer = styled.div`
   padding: 60px 20px;
 `;
 
-const LinkButton = styled(Link)`
+const LinkButton = styled.a`
   display: inline-block;
   margin-top: 20px;
   background-color: #3b82f6;
@@ -119,10 +121,17 @@ const Loading = styled.p`
   color: #6b7280;
 `;
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function EditProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = React.use(params);
+  const router = useRouter();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -140,6 +149,22 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     fetchProduct();
   }, [id]);
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!product) return;
+
+    setSaving(true);
+    const formData = new FormData(e.currentTarget);
+    await updateProductAction(product.id, {
+      name: String(formData.get("name")),
+      description: (formData.get("description") as string) || undefined,
+      price: Number(formData.get("price")),
+    });
+
+    setSaving(false);
+    router.push("/produtos");
+  }
+
   if (loading) {
     return <Loading>Carregando...</Loading>;
   }
@@ -148,24 +173,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     return (
       <NotFoundContainer>
         <Title>Produto não encontrado</Title>
-        <p>O produto que você está tentando editar não existe. Deseja cadastrar um novo produto?</p>
+        <p>O produto que você está tentando editar não existe.</p>
         <LinkButton href="/produtos/new">Cadastrar Novo Produto</LinkButton>
       </NotFoundContainer>
     );
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!product) return;
-
-    const formData = new FormData(e.currentTarget);
-    await updateProductAction(product.id, {
-      name: String(formData.get("name")),
-      description: (formData.get("description") as string) || undefined,
-      price: Number(formData.get("price")),
-    });
-
-    alert("Produto atualizado!");
   }
 
   return (
@@ -173,10 +184,28 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       <PageContainer>
         <Form onSubmit={handleSubmit}>
           <Title>Editar Produto</Title>
-          <Input name="name" defaultValue={product.name} required placeholder="Nome do produto" />
-          <Textarea name="description" defaultValue={product.description ?? ""} placeholder="Descrição do produto" />
-          <Input name="price" type="number" step="0.01" defaultValue={product.price} required placeholder="Preço" />
-          <Button type="submit">Salvar</Button>
+          <Input
+            name="name"
+            defaultValue={product.name}
+            required
+            placeholder="Nome do produto"
+          />
+          <Textarea
+            name="description"
+            defaultValue={product.description ?? ""}
+            placeholder="Descrição do produto"
+          />
+          <Input
+            name="price"
+            type="number"
+            step="0.01"
+            defaultValue={product.price}
+            required
+            placeholder="Preço"
+          />
+          <Button type="submit" disabled={saving}>
+            {saving ? "Salvando..." : "Salvar"}
+          </Button>
         </Form>
       </PageContainer>
     </AdminWrapper>
