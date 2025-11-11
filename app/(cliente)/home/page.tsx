@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { getAllProducts } from "@/lib/actions/products";
+import { addToCart, getAllProducts } from "@/lib/actions/products";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
+	id: string;
+	name: string;
+	price: number;
+	stock: number;
 }
 
 const Container = styled.div`
@@ -98,49 +98,52 @@ const Loading = styled.p`
 `;
 
 export default function HomeCliente() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+	const [products, setProducts] = useState<Product[]>([]);
+	const [loading, setLoading] = useState(true);
+	const router = useRouter();
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const data = await getAllProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
-  }, []);
+	useEffect(() => {
+		async function fetchProducts() {
+			try {
+				const data = await getAllProducts();
+				setProducts(data);
+			} catch (error) {
+				console.error("Erro ao buscar produtos:", error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		fetchProducts();
+	}, []);
 
-  const handleAddToCart = () => {
-    router.push("/cart");
-  };
+	const handleAddToCart = async (productId: string) => {
+		await addToCart(productId, 1);
+		router.push("/cart");
+	};
 
-  if (loading) {
-    return <Loading>Carregando produtos...</Loading>;
-  }
+	if (loading) {
+		return <Loading>Carregando produtos...</Loading>;
+	}
 
-  return (
-    <Container>
-      {products.map((product) => (
-        <Card key={product.id}>
-          <ProductImage>
-            <Image 
-              src="/produto_sem_imagem.jpg"
-              alt={product.name}
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </ProductImage>
-          <ProductName>{product.name}</ProductName>
-          <ProductPrice>R$ {product.price.toFixed(2)}</ProductPrice>
-          <AddButton onClick={handleAddToCart}>Adicionar ao Carrinho</AddButton>
-        </Card>
-      ))}
-    </Container>
-  );
+	return (
+		<Container>
+			{products.map((product) => (
+				<Card key={product.id}>
+					<ProductImage>
+						<Image
+							src="/produto_sem_imagem.jpg"
+							alt={product.name}
+							fill
+							style={{ objectFit: "cover" }}
+						/>
+					</ProductImage>
+					<ProductName>{product.name}</ProductName>
+					<ProductPrice>R$ {product.price.toFixed(2)}</ProductPrice>
+					<AddButton onClick={() => handleAddToCart(product.id)}>
+						Adicionar ao Carrinho
+					</AddButton>
+				</Card>
+			))}
+		</Container>
+	);
 }
