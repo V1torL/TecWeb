@@ -1,98 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import styled from "styled-components";
 import { getAllProducts } from "@/lib/actions/products";
 import { addStockAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
-
-const Container = styled.div`
-  width: 100%;
-  padding: 20px;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #111827;
-`;
-
-const TableWrapper = styled.div`
-  overflow-x: auto;
-  border-radius: 12px;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  min-width: 600px;
-
-  th,
-  td {
-    padding: 12px 16px;
-    text-align: left;
-  }
-
-  th {
-    background-color: #f3f4f6;
-    font-weight: 600;
-    color: #374151;
-  }
-
-  td {
-    border-top: 1px solid #e5e7eb;
-    color: #4b5563;
-  }
-
-  tr:hover td {
-    background-color: #f9fafb;
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  gap: 8px;
-`;
-
-const Input = styled.input`
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  width: 70px;
-  font-size: 0.95rem;
-  outline: none;
-
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-`;
-
-const AddButton = styled.button<{ loading?: boolean }>`
-  padding: 6px 12px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    background-color: #93c5fd;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
+import "./estoque.css";
 
 interface Product {
   id: string;
@@ -123,10 +35,10 @@ export default function EstoquePage() {
 
   return (
     <AdminWrapper>
-      <Container>
-        <Title>Gerenciamento de Estoque</Title>
-        <TableWrapper>
-          <Table>
+      <div className="page-container">
+        <h1 className="page-title">Gerenciamento de Estoque</h1>
+        <div className="table-wrapper">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>Produto</th>
@@ -140,7 +52,8 @@ export default function EstoquePage() {
                   <td>{p.name}</td>
                   <td>{p.stock}</td>
                   <td>
-                    <Form
+                    <form
+                      className="estoque-form"
                       onSubmit={async (e) => {
                         e.preventDefault();
                         const form = e.target as HTMLFormElement;
@@ -151,18 +64,18 @@ export default function EstoquePage() {
                         form.reset();
                       }}
                     >
-                      <Input name="count" type="number" min="1" required />
-                      <AddButton type="submit" disabled={loadingIds.includes(p.id)}>
+                      <input name="count" type="number" min="1" required className="estoque-input" />
+                      <button type="submit" disabled={loadingIds.includes(p.id)}>
                         {loadingIds.includes(p.id) ? "Adicionando..." : "Adicionar"}
-                      </AddButton>
-                    </Form>
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </Table>
-        </TableWrapper>
-      </Container>
+          </table>
+        </div>
+      </div>
     </AdminWrapper>
   );
 }

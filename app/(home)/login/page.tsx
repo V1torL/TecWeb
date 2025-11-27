@@ -23,7 +23,7 @@ export default function Login() {
 					<Input type="email" name="email" placeholder="Email" required />
 					<Input name="password" type="password" placeholder="Senha" required />
 					{!error ? null : <p>{error}</p>}
-					<button type="button" disabled={pending}>
+					<button type="submit" disabled={pending}>
 						{pending ? "Entrando..." : "Entrar"}
 					</button>
 				</form>

@@ -1,0 +1,15 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+  min-height: calc(100vh - 40px);
+}
+
+.dashboard-paragraph {
+  color: #6b7280;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}

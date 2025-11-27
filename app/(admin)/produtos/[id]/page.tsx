@@ -3,10 +3,10 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styled from "styled-components";
 import { getProductById } from "@/lib/actions/products";
 import { updateProductAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
+import "./edit.css";
 
 interface Product {
   id: string;
@@ -17,109 +17,6 @@ interface Product {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-const PageContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px 20px;
-`;
-
-const Form = styled.form`
-  width: 100%;
-  max-width: 600px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 32px 24px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  color: #111827;
-`;
-
-const Input = styled.input`
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.2s;
-
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-`;
-
-const Textarea = styled.textarea`
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.2s;
-  min-height: 100px;
-
-  &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-`;
-
-const Button = styled.button<{ disabled?: boolean }>`
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background-color: ${({ disabled }) => (disabled ? "#6b7280" : "#10b981")};
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: ${({ disabled }) => (disabled ? "#6b7280" : "#059669")};
-    transform: ${({ disabled }) => (disabled ? "none" : "translateY(-1px)")};
-    box-shadow: ${({ disabled }) =>
-      disabled ? "none" : "0 4px 10px rgba(0,0,0,0.15)"};
-  }
-`;
-
-const NotFoundContainer = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-`;
-
-const LinkButton = styled.a`
-  display: inline-block;
-  margin-top: 20px;
-  background-color: #3b82f6;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-  }
-`;
-
-const Loading = styled.p`
-  text-align: center;
-  margin-top: 60px;
-  font-size: 1.2rem;
-  color: #6b7280;
-`;
 
 export default function EditProductPage({
   params,
@@ -166,36 +63,38 @@ export default function EditProductPage({
   }
 
   if (loading) {
-    return <Loading>Carregando...</Loading>;
+    return <p className="edit-product-loading">Carregando...</p>;
   }
 
   if (!product) {
     return (
-      <NotFoundContainer>
-        <Title>Produto não encontrado</Title>
+      <div className="edit-product-not-found">
+        <h1 className="page-title">Produto não encontrado</h1>
         <p>O produto que você está tentando editar não existe.</p>
-        <LinkButton href="/produtos/new">Cadastrar Novo Produto</LinkButton>
-      </NotFoundContainer>
+        <a href="/produtos/new">
+          <button>Cadastrar Novo Produto</button>
+        </a>
+      </div>
     );
   }
 
   return (
     <AdminWrapper>
-      <PageContainer>
-        <Form onSubmit={handleSubmit}>
-          <Title>Editar Produto</Title>
-          <Input
+      <div className="centered-container">
+        <form className="form-container" onSubmit={handleSubmit}>
+          <h1 className="page-title">Editar Produto</h1>
+          <input
             name="name"
             defaultValue={product.name}
             required
             placeholder="Nome do produto"
           />
-          <Textarea
+          <textarea
             name="description"
             defaultValue={product.description ?? ""}
             placeholder="Descrição do produto"
           />
-          <Input
+          <input
             name="price"
             type="number"
             step="0.01"
@@ -203,11 +102,11 @@ export default function EditProductPage({
             required
             placeholder="Preço"
           />
-          <Button type="submit" disabled={saving}>
+          <button type="submit" disabled={saving} className="success">
             {saving ? "Salvando..." : "Salvar"}
-          </Button>
-        </Form>
-      </PageContainer>
+          </button>
+        </form>
+      </div>
     </AdminWrapper>
   );
 }
