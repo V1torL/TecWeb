@@ -29,8 +29,9 @@ export async function createProduct(data: {
 	revalidatePath("/admin/dashboard/products");
 }
 
-export async function getAllProducts() {
+export async function getAllProducts(name: string | undefined = undefined) {
 	return await prisma.product.findMany({
+		where: { name: { contains: name || "" } },
 		orderBy: { createdAt: "desc" },
 	});
 }

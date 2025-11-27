@@ -1,22 +1,15 @@
+import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { Product } from "@prisma/client";
-import { redirect } from "next/navigation";
 import "./cart.css";
-import { Button } from "@/lib/elements";
-import Client, { Props } from "./client";
+import Client, { type Props } from "./client";
 
-async function formSubmit(data: FormData) {
-	const obj = Object.fromEntries(data);
-	const cartId = obj.cartId as string;
-}
-
-export default async function Cart() {
+export async function getProps(): Promise<Props> {
 	const user = await getUser();
 	if (!user || !user.client) {
 		redirect("/home");
 	}
-	const cart = await prisma.cart.findFirst({
+	var cart = await prisma.cart.findFirst({
 		where: {
 			clientId: user.client.id,
 		},
@@ -25,7 +18,14 @@ export default async function Cart() {
 		},
 	});
 	if (!cart) {
-		throw "No cart";
+		cart = await prisma.cart.create({
+			data: {
+				clientId: user.client.id,
+			},
+			include: {
+				products: true,
+			},
+		});
 	}
 	const productsInCart = cart?.products || [];
 
@@ -40,7 +40,14 @@ export default async function Cart() {
 			}) || [],
 		)
 	).filter((p) => p.product !== null) as Props["products"];
+	return {
+		cart,
+		products,
+	};
+}
 
+export default async function Cart() {
+	const { cart, products } = await getProps();
 	return (
 		<form className="flex-list">
 			{products.length === 0 ? (

@@ -2,6 +2,23 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const PRODUCTS = [
+	{
+		name: "Chiclete",
+		description: "Chiclete sabor tutti-frutti",
+		price: 1.5,
+		stock: 100,
+	},
+	{ name: "Bala", description: "Bala sortida", price: 0.25, stock: 500 },
+	{
+		name: "Refrigerante",
+		description: "Refrigerante lata 350ml",
+		price: 6.0,
+		stock: 50,
+	},
+	{ name: "Biscoito", description: "Biscoito recheado", price: 3.5, stock: 80 },
+];
+
 async function main() {
 	console.log("🌱 Iniciando seed...");
 
@@ -40,9 +57,10 @@ async function main() {
 			client: true,
 		},
 	});
-	console.log("✅ Cliente criado:", clientUser.email);
 
-	console.log("🌱 Seed finalizado com sucesso!");
+	await prisma.product.createMany({
+		data: PRODUCTS,
+	});
 }
 
 main()

@@ -7,7 +7,6 @@ export interface Props {
 	cart: Cart;
 	products: (ProductInCart & { product: Product })[];
 }
-
 export default function Client({ cart, products: initialProducts }: Props) {
 	const [products, setProducts] = useState(initialProducts);
 	return (

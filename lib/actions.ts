@@ -55,7 +55,7 @@ export async function loginAction(
 		if (user.tipo === "ADMIN") {
 			redirect("/dashboard");
 		} else {
-			redirect("/home");
+			redirect("/perfil");
 		}
 	} catch (e) {
 		if (e instanceof AuthError) {
