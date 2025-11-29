@@ -6,17 +6,9 @@ import { useRouter } from "next/navigation";
 import { getProductById } from "@/lib/actions/products";
 import { updateProductAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
+import { Input } from "@/lib/components";
+import type { Product } from "@prisma/client";
 import "./edit.css";
-
-interface Product {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  stock?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 export default function EditProductPage({
   params,
@@ -35,7 +27,7 @@ export default function EditProductPage({
       try {
         const p = await getProductById(id);
         if (p) {
-          setProduct({ ...p, description: p.description ?? undefined });
+          setProduct(p);
         } else {
           setProduct(null);
         }
@@ -83,7 +75,7 @@ export default function EditProductPage({
       <div className="centered-container">
         <form className="form-container" onSubmit={handleSubmit}>
           <h1 className="page-title">Editar Produto</h1>
-          <input
+          <Input
             name="name"
             defaultValue={product.name}
             required
@@ -94,7 +86,7 @@ export default function EditProductPage({
             defaultValue={product.description ?? ""}
             placeholder="Descrição do produto"
           />
-          <input
+          <Input
             name="price"
             type="number"
             step="0.01"

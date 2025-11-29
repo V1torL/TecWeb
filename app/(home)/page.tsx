@@ -6,25 +6,22 @@ import { useCallback, useEffect, useState } from "react";
 import { addToCart, getAllProducts } from "@/lib/actions/products";
 import "./home.css";
 import { useAppContext } from "@/lib/app-context";
-
-interface Product {
-	id: string;
-	name: string;
-	price: number;
-	stock: number;
-}
+import QuantitySelector from "@/components/QuantitySelector";
+import type { Product } from "@prisma/client";
 
 export default function Home() {
 	const { search } = useAppContext();
 	const [products, setProducts] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [quantities, setQuantities] = useState<Record<string, number>>({});
 	const router = useRouter();
 	const handleAddToCart = useCallback(
-		async (i: string) => {
-			await addToCart(i, 1);
+		async (productId: string) => {
+			const quantity = quantities[productId] || 1;
+			await addToCart(productId, quantity);
 			router.push("/cart");
 		},
-		[router],
+		[router, quantities],
 	);
 
 	useEffect(() => {
@@ -57,6 +54,12 @@ export default function Home() {
 					</div>
 					<h2 className="product-name">{product.name}</h2>
 					<p className="product-price">R$ {product.price.toFixed(2)}</p>
+					<QuantitySelector
+						max={product.stock}
+						onChange={(value) =>
+							setQuantities((prev) => ({ ...prev, [product.id]: value }))
+						}
+					/>
 					<button type="button" onClick={() => handleAddToCart(product.id)}>
 						Adicionar ao Carrinho
 					</button>

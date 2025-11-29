@@ -4,13 +4,8 @@ import { useState, useEffect } from "react";
 import { getAllProducts } from "@/lib/actions/products";
 import { addStockAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
+import type { Product } from "@prisma/client";
 import "./estoque.css";
-
-interface Product {
-  id: string;
-  name: string;
-  stock: number;
-}
 
 export default function EstoquePage() {
   const [products, setProducts] = useState<Product[]>([]);

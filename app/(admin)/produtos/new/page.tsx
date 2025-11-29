@@ -2,6 +2,7 @@
 
 import { createProductAction } from "@/lib/actions/productsActions";
 import AdminWrapper from "@/components/AdminWrapper";
+import { Input } from "@/lib/components";
 import "./new.css";
 
 export default function NewProductPage() {
@@ -15,7 +16,7 @@ export default function NewProductPage() {
       <div className="centered-container">
         <form className="form-container" action={handleSubmit}>
           <h1 className="page-title">Novo Produto</h1>
-          <input
+          <Input
             name="name"
             placeholder="Nome do produto"
             required
@@ -24,14 +25,14 @@ export default function NewProductPage() {
             name="description"
             placeholder="Descrição do produto"
           />
-          <input
+          <Input
             name="price"
             type="number"
             step="0.01"
             placeholder="Preço"
             required
           />
-          <input
+          <Input
             name="stock"
             type="number"
             placeholder="Estoque"

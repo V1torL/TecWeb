@@ -5,14 +5,8 @@ import { deleteProductAction } from "@/lib/actions/productsActions";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import AdminWrapper from "@/components/AdminWrapper";
+import type { Product } from "@prisma/client";
 import "./produtos.css";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
