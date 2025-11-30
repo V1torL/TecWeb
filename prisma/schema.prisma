@@ -145,6 +145,7 @@ model Cart {
 model Order {
   id          String   @id @default(cuid())
   status      String
+  created_at DateTime @default(now())
   arrive_date DateTime?
   paymentId   String?
 

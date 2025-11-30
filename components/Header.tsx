@@ -5,6 +5,8 @@ import LogOut from "./HeaderCliente";
 import "./header.css";
 import SearchBar from "./SearchBar";
 
+export const dynamic = "force-dynamic";
+
 // <AuthArea>
 // 	<div className="login-links">
 // 		<Link href="/login">Entre</Link>
@@ -38,16 +40,11 @@ export default async function Header() {
 							<LogOut />
 						</>
 					) : (
-						<>
-							<div className="login-links">
-								<Link href="/login">Entre</Link>
-								<span>ou</span>
-								<Link href="/register">Cadastre-se</Link>
-							</div>
-							<Link href="/login">
-								<ShoppingCart size={20} />
-							</Link>
-						</>
+						<div className="login-links">
+							<Link href="/login">Entre</Link>
+							<span>ou</span>
+							<Link href="/register">Cadastre-se</Link>
+						</div>
 					)}
 				</div>
 			</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { addToCart, getAllProducts } from "@/lib/actions/products";
 import "./home.css";
@@ -41,7 +41,7 @@ export default function Home() {
 	if (loading) return <p>Carregando...</p>;
 
 	return (
-		<div className="container">
+		<div className="p2 container">
 			{products.map((product) => (
 				<div className="card" key={product.id}>
 					<div className="product-image">

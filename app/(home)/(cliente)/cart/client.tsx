@@ -1,38 +1,42 @@
 "use client";
 
+import QuantitySelector from "@/components/QuantitySelector";
 import type { Cart, Product, ProductInCart } from "@prisma/client";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 
 export interface Props {
 	cart: Cart;
 	products: (ProductInCart & { product: Product })[];
 }
+
+function PurchaseButton() {
+	const { pending } = useFormStatus();
+
+	const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		if (!pending) {
+			const total = document.querySelector('[data-cart-total]')?.textContent;
+			const confirmed = confirm(`Confirma a compra de ${total}?`);
+			if (!confirmed) {
+				e.preventDefault();
+			}
+		}
+	};
+
+	return (
+		<button type="submit" onClick={handleClick} disabled={pending}>
+			{pending ? "Processando..." : "Comprar"}
+		</button>
+	);
+}
+
 export default function Client({ cart, products: initialProducts }: Props) {
 	const [products, setProducts] = useState(initialProducts);
-	const [inputValues, setInputValues] = useState<Record<string, string>>(
-		Object.fromEntries(initialProducts.map(p => [p.id, String(p.amount)]))
+
+	const cartTotal = products.reduce(
+		(sum, p) => sum + p.amount * p.product.price,
+		0
 	);
-
-	const handleInputChange = (productId: string, index: number, rawValue: string) => {
-		setInputValues(prev => ({ ...prev, [productId]: rawValue }));
-
-		const val = parseFloat(rawValue);
-		if (!Number.isNaN(val) && val > 0) {
-			setProducts((products) => {
-				const newProducts = [...products];
-				newProducts[index] = { ...newProducts[index], amount: val };
-				return newProducts;
-			});
-		}
-	};
-
-	const handleBlur = (productId: string, index: number) => {
-		const val = parseFloat(inputValues[productId]);
-		if (Number.isNaN(val) || val <= 0) {
-			// Reset to the current product amount
-			setInputValues(prev => ({ ...prev, [productId]: String(products[index].amount) }));
-		}
-	};
 
 	return (
 		<>
@@ -50,22 +54,30 @@ export default function Client({ cart, products: initialProducts }: Props) {
 					{products.map((p, i) => (
 						<tr key={p.id}>
 							<td>{p.product.name}</td>
-							<td>R$ {p.product.price}</td>
+							<td>R$ {p.product.price.toFixed(2)}</td>
 							<td>
-								<input
-									type="number"
-									value={inputValues[p.id]}
-									onChange={(ev) => handleInputChange(p.id, i, ev.target.value)}
-									onBlur={() => handleBlur(p.id, i)}
-									min="1"
+								<QuantitySelector
+									initialValue={initialProducts[i].amount}
+									onChange={(val) =>
+										setProducts((ps) => {
+											const prods = ps.slice();
+											prods[i].amount = val;
+											return prods;
+										})
+									}
 								/>
 							</td>
-							<td>R$ {p.amount * p.product.price}</td>
+							<td>R$ {(p.amount * p.product.price).toFixed(2)}</td>
 						</tr>
 					))}
 				</tbody>
 			</table>
-			<button type="submit">Comprar</button>
+			<div className="cart-summary">
+				<strong data-cart-total>
+					Total: R$ {cartTotal.toFixed(2)}
+				</strong>
+			</div>
+			<PurchaseButton />
 		</>
 	);
 }

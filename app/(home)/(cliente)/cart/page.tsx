@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
+import { completePurchase } from "@/lib/actions/cart";
 import prisma from "@/lib/prisma";
 import "./cart.css";
 import Client, { type Props } from "./client";
@@ -7,11 +8,12 @@ import Client, { type Props } from "./client";
 export async function getProps(): Promise<Props> {
 	const user = await getUser();
 	if (!user || !user.client) {
-		redirect("/home");
+		redirect("/");
 	}
 	var cart = await prisma.cart.findFirst({
 		where: {
 			clientId: user.client.id,
+			orderId: null, // Only get active carts (not completed orders)
 		},
 		include: {
 			products: true,
@@ -45,11 +47,10 @@ export async function getProps(): Promise<Props> {
 		products,
 	};
 }
-
 export default async function Cart() {
 	const { cart, products } = await getProps();
 	return (
-		<form className="flex-list">
+		<form className="flex-list" action={completePurchase}>
 			{products.length === 0 ? (
 				<p>Sem produtos ainda!</p>
 			) : (
