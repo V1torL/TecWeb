@@ -1,6 +1,27 @@
+.p2.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
 .product-image {
   width: 100%;
-  height: 140px;
+  height: 180px;
   background-color: #f3f4f6;
   border-radius: 8px;
   margin-bottom: 12px;
@@ -9,9 +30,28 @@
   justify-content: center;
   overflow: hidden;
   position: relative;
+  border: 1px solid #e5e7eb;
 }
 
-/* h2 */
+.product-image-content {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .product-image-content {
+  transform: scale(1.05);
+}
+
+.no-image-indicator {
+  position: absolute;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 12px;
+  border-radius: 20px;
+  z-index: 1;
+}
+
 .product-name {
   font-size: 1.1rem;
   font-weight: 700;
@@ -20,10 +60,56 @@
   min-height: 48px;
 }
 
-/* p */
 .product-price {
   font-size: 1.1rem;
   font-weight: 600;
   color: #10b981;
   margin-bottom: 8px;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #4338ca;
+}
+
+.disabled-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #d1d5db;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: not-allowed;
+  margin-top: 8px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .product-image {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-image {
+    height: 130px;
+  }
 }

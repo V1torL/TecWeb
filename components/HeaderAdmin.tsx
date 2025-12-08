@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PackagePlus, Boxes, ClipboardList, ScrollText, AlignEndHorizontal, LogOut } from "lucide-react";
+import { PackagePlus, Boxes, ClipboardList, ScrollText, PackageSearch, AlignEndHorizontal, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 import "./admin.css";
 
@@ -38,6 +38,11 @@ export default function HeaderAdmin() {
         <Link href="/logs" className="sidebar-nav-link">
           <ScrollText size={20} />
           Histórico de Logs
+        </Link>
+
+        <Link href="/pedidos" className="sidebar-nav-link">
+          <PackageSearch size={20} />
+          Gerenciar Pedidos
         </Link>
       </nav>
 
