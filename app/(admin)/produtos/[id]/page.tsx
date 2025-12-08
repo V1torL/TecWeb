@@ -192,7 +192,7 @@ export default function EditProductPage({
                 <div className="current-image">
                   <div className="image-preview-container">
                     {imagePreview.startsWith('data:') ? (
-                      <Image 
+                      <img 
                         src={imagePreview} 
                         alt="Preview" 
                         className="preview-image"

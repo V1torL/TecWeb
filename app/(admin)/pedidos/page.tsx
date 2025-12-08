@@ -2,11 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllOrders } from "@/lib/actions/orderActions";
-import { updateOrderStatus } from "@/lib/actions/orderActions";
+import { getAllOrders, updateOrderStatus, updateOrderArriveDate } from "@/lib/actions/orderActions";
 import AdminWrapper from "@/components/AdminWrapper";
 import type { Order, Payment, Cart, ProductInCart, Product, Client, User } from "@prisma/client";
-import { Eye, Package, User as UserIcon, Calendar, DollarSign, CreditCard } from "lucide-react";
+import { Eye, Package, User as UserIcon, Calendar, DollarSign, CreditCard, Truck, Clock } from "lucide-react";
 import "./pedidos.css";
 
 type OrderWithRelations = Order & {
@@ -35,6 +34,8 @@ export default function PedidosPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithRelations | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingArriveDate, setEditingArriveDate] = useState(false);
+  const [newArriveDate, setNewArriveDate] = useState("");
 
   useEffect(() => {
     async function fetchOrders() {
@@ -72,14 +73,44 @@ export default function PedidosPage() {
     }
   }
 
+  async function handleArriveDateChange(orderId: string) {
+    if (!newArriveDate) return;
+    
+    setUpdatingId(orderId);
+    try {
+      const result = await updateOrderArriveDate(orderId, newArriveDate);
+      if (result.success) {
+        setOrders(prev =>
+          prev.map(order =>
+            order.id === orderId ? { ...order, arrive_date: new Date(newArriveDate) } : order
+          )
+        );
+        // Atualizar também no modal se estiver aberto
+        if (selectedOrder?.id === orderId) {
+          setSelectedOrder(prev => prev ? { ...prev, arrive_date: new Date(newArriveDate) } : null);
+        }
+        setEditingArriveDate(false);
+        setNewArriveDate("");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar data de entrega:", error);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   function openOrderDetails(order: OrderWithRelations) {
     setSelectedOrder(order);
     setIsModalOpen(true);
+    setEditingArriveDate(false);
+    setNewArriveDate("");
   }
 
   function closeModal() {
     setIsModalOpen(false);
     setSelectedOrder(null);
+    setEditingArriveDate(false);
+    setNewArriveDate("");
   }
 
   const calculateTotal = (cart: Cart & { products: (ProductInCart & { product: Product })[] }) => {
@@ -88,7 +119,8 @@ export default function PedidosPage() {
     }, 0);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return "Não definida";
     return new Date(date).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -96,6 +128,14 @@ export default function PedidosPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatDateInput = (date: Date | null) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const offset = d.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localDate = new Date(d.getTime() - offset);
+    return localDate.toISOString().slice(0, 16);
   };
 
   if (loading) {
@@ -120,7 +160,8 @@ export default function PedidosPage() {
               <tr>
                 <th>ID</th>
                 <th>Cliente</th>
-                <th>Data</th>
+                <th>Data do Pedido</th>
+                <th>Data de Entrega</th>
                 <th>Total</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -129,7 +170,7 @@ export default function PedidosPage() {
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="empty-cell">
+                  <td colSpan={8} className="empty-cell">
                     Nenhum pedido encontrado
                   </td>
                 </tr>
@@ -145,7 +186,25 @@ export default function PedidosPage() {
                         #{order.id.substring(0, 8).toUpperCase()}
                       </td>
                       <td>{clientNome}</td>
-                      <td>{formatDate(order.created_at)}</td>
+                      <td>
+                        <div className="date-with-icon">
+                          <Calendar size={14} />
+                          {formatDate(order.created_at)}
+                        </div>
+                      </td>
+                      <td>
+                        {order.arrive_date ? (
+                          <div className="date-with-icon">
+                            <Truck size={14} />
+                            {formatDate(order.arrive_date)}
+                          </div>
+                        ) : (
+                          <div className="date-with-icon">
+                            <Clock size={14} />
+                            <span className="no-date">Não definida</span>
+                          </div>
+                        )}
+                      </td>
                       <td className="order-total">
                         R$ {total.toFixed(2)}
                       </td>
@@ -216,9 +275,58 @@ export default function PedidosPage() {
                   <div className="info-item">
                     <div className="info-label">
                       <Calendar size={16} />
-                      <span>Data</span>
+                      <span>Data do Pedido</span>
                     </div>
                     <div className="info-value">{formatDate(selectedOrder.created_at)}</div>
+                  </div>
+
+                  <div className="info-item">
+                    <div className="info-label">
+                      <Truck size={16} />
+                      <span>Data de Entrega</span>
+                    </div>
+                    <div className="info-value">
+                      {editingArriveDate ? (
+                        <div className="date-edit-container">
+                          <input
+                            type="datetime-local"
+                            value={newArriveDate || formatDateInput(selectedOrder.arrive_date)}
+                            onChange={(e) => setNewArriveDate(e.target.value)}
+                            className="date-input"
+                            min={formatDateInput(new Date())}
+                          />
+                          <div className="date-edit-buttons">
+                            <button
+                              onClick={() => handleArriveDateChange(selectedOrder.id)}
+                              disabled={updatingId === selectedOrder.id}
+                              className="date-save-btn"
+                            >
+                              {updatingId === selectedOrder.id ? "Salvando..." : "Salvar"}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingArriveDate(false);
+                                setNewArriveDate("");
+                              }}
+                              className="date-cancel-btn"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="date-display">
+                          <span>{formatDate(selectedOrder.arrive_date)}</span>
+                          <button
+                            onClick={() => setEditingArriveDate(true)}
+                            className="date-edit-btn"
+                            title="Editar data de entrega"
+                          >
+                            Editar
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="info-item">
@@ -245,6 +353,7 @@ export default function PedidosPage() {
                 </div>
               </div>
 
+              {/* Resto do código permanece igual... */}
               {selectedOrder.carts[0]?.client && (
                 <div className="customer-info-section">
                   <h3 className="section-title">

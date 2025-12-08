@@ -3,16 +3,35 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+export async function updateOrderArriveDate(orderId: string, arriveDate: string) {
+  try {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { 
+        arrive_date: new Date(arriveDate)
+      }
+    });
+
+    revalidatePath("/admin/pedidos");
+    return { success: true, message: "Data de entrega atualizada com sucesso" };
+  } catch (error) {
+    console.error("Erro ao atualizar data de entrega:", error);
+    throw new Error("Erro ao atualizar data de entrega");
+  }
+}
+
 export async function getAllOrders() {
   try {
-    const pedidos = await prisma.order.findMany({
+    const orders = await prisma.order.findMany({
       include: {
         carts: {
           include: {
             client: {
               include: {
                 user: {
-                  select: { email: true }
+                  select: {
+                    email: true
+                  }
                 }
               }
             },
@@ -30,12 +49,13 @@ export async function getAllOrders() {
       }
     });
 
-    return pedidos;
+    return orders;
   } catch (error) {
     console.error("Erro ao buscar pedidos:", error);
-    throw new Error("Erro ao buscar pedidos");
+    throw new Error("Erro ao carregar pedidos");
   }
 }
+
 
 export async function updateOrderStatus(orderId: string, status: string) {
   try {
