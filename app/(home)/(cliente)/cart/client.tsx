@@ -3,81 +3,93 @@
 import QuantitySelector from "@/components/QuantitySelector";
 import type { Cart, Product, ProductInCart } from "@prisma/client";
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { removeItemFromCart } from "@/lib/actions/cart";
 
 export interface Props {
-	cart: Cart;
-	products: (ProductInCart & { product: Product })[];
+    cart: Cart;
+    products: (ProductInCart & { product: Product })[];
 }
 
-function PurchaseButton() {
-	const { pending } = useFormStatus();
+export default function Client({ products: initialProducts }: Props) {
+    const [products, setProducts] = useState(initialProducts);
+    const router = useRouter();
 
-	const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (!pending) {
-			const total = document.querySelector('[data-cart-total]')?.textContent;
-			const confirmed = confirm(`Confirma a compra de ${total}?`);
-			if (!confirmed) {
-				e.preventDefault();
-			}
-		}
-	};
+    const cartTotal = products.reduce(
+        (sum, p) => sum + p.amount * p.product.price,
+        0
+    );
 
-	return (
-		<button type="submit" onClick={handleClick} disabled={pending}>
-			{pending ? "Processando..." : "Comprar"}
-		</button>
-	);
-}
+    const handleContinue = () => {
+        router.push("/checkout");
+    };
 
-export default function Client({ cart, products: initialProducts }: Props) {
-	const [products, setProducts] = useState(initialProducts);
+    const handleRemove = async (id: string, index: number) => {
+        await removeItemFromCart(id);
 
-	const cartTotal = products.reduce(
-		(sum, p) => sum + p.amount * p.product.price,
-		0
-	);
+        setProducts((prev) => prev.filter((_, i) => i !== index));
 
-	return (
-		<>
-			<input type="hidden" name="cartId" value={cart.id} />
-			<table>
-				<thead>
-					<tr>
-						<th>Nome</th>
-						<th>Preço</th>
-						<th>Quantia</th>
-						<th>Total</th>
-					</tr>
-				</thead>
-				<tbody>
-					{products.map((p, i) => (
-						<tr key={p.id}>
-							<td>{p.product.name}</td>
-							<td>R$ {p.product.price.toFixed(2)}</td>
-							<td>
-								<QuantitySelector
-									initialValue={initialProducts[i].amount}
-									onChange={(val) =>
-										setProducts((ps) => {
-											const prods = ps.slice();
-											prods[i].amount = val;
-											return prods;
-										})
-									}
-								/>
-							</td>
-							<td>R$ {(p.amount * p.product.price).toFixed(2)}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-			<div className="cart-summary">
-				<strong data-cart-total>
-					Total: R$ {cartTotal.toFixed(2)}
-				</strong>
-			</div>
-			<PurchaseButton />
-		</>
-	);
+        router.refresh();
+    };
+
+    return (
+        <>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Quantia</th>
+                        <th>Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {products.map((p, i) => (
+                        <tr key={p.id}>
+                            <td>{p.product.name}</td>
+                            <td>R$ {p.product.price.toFixed(2)}</td>
+                            <td>
+                                <QuantitySelector
+                                    initialValue={initialProducts[i].amount}
+                                    onChange={(val) =>
+                                        setProducts((ps) => {
+                                            const prods = ps.slice();
+                                            prods[i].amount = val;
+                                            return prods;
+                                        })
+                                    }
+                                />
+                            </td>
+                            <td>R$ {(p.amount * p.product.price).toFixed(2)}</td>
+
+                            <td>
+                                <button
+                                    type="button"
+                                    className="remove-btn"
+                                    onClick={() => handleRemove(p.id, i)}
+                                >
+                                    Remover
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            <div className="cart-summary">
+                <strong data-cart-total>
+                    Total: R$ {cartTotal.toFixed(2)}
+                </strong>
+            </div>
+
+            <button
+                type="button"
+                onClick={handleContinue}
+                className="continue-button"
+            >
+                Continuar para Finalizar Compra
+            </button>
+        </>
+    );
 }

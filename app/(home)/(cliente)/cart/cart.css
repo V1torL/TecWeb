@@ -75,3 +75,18 @@ button[type="submit"]:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
 }
+
+.remove-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}

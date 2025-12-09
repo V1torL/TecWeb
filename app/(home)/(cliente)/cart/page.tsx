@@ -10,10 +10,10 @@ export async function getProps(): Promise<Props> {
 	if (!user || !user.client) {
 		redirect("/");
 	}
-	var cart = await prisma.cart.findFirst({
+	let cart = await prisma.cart.findFirst({
 		where: {
 			clientId: user.client.id,
-			orderId: null, // Only get active carts (not completed orders)
+			orderId: null, 
 		},
 		include: {
 			products: true,

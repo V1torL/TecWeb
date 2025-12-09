@@ -19,7 +19,7 @@ model User {
   admin   Admin?
   client  Client?
 
-  // Coisas do authjs
+  // Auth.js
   image String?
   accounts Account[]
   sessions Session[]
@@ -44,11 +44,32 @@ model Client {
   telefone String
   endereco String
   cidade   String
+
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  addresses Address[]
+
   carts Cart[]
   @@map("clients")
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  rua        String
+  bairro     String
+  cidade     String
+  estado     String
+  cep        String
+  numero     String?
+  complemento String?
+
+  createdAt DateTime @default(now())
+
+  payments Payment[]
 }
 
 enum UserType {
@@ -117,10 +138,10 @@ model AddStock {
   count          Int
   createdAt      DateTime @default(now())
   productId      String
-  adminId String
+  adminId        String
 
-  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  admin         Admin          @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  admin   Admin   @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model ProductInCart {
@@ -146,7 +167,7 @@ model Cart {
 model Order {
   id          String   @id @default(cuid())
   status      String
-  created_at DateTime @default(now())
+  created_at  DateTime @default(now())
   arrive_date DateTime?
   paymentId   String?
 
@@ -156,8 +177,13 @@ model Order {
 
 model Payment {
   id         String   @id @default(cuid())
+
   method     String
-  address    String
   total_paid Float
+  manualAddress String?
+
+  addressId String?
+  address   Address? @relation(fields: [addressId], references: [id])
+
   orders     Order[]
 }
